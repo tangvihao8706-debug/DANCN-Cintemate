@@ -1,0 +1,136 @@
+﻿@model List<EventManager.Models.EventRating>
+
+@{
+    ViewData["Title"] = "Quản lý đánh giá phim";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-text-main: #333;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #ffeaf5, #ffffff);
+        color: var(--cm-text-main);
+    }
+
+    h2.cm-title {
+        color: var(--cm-pink-strong);
+        text-shadow: 0 0 10px rgba(255, 190, 210, 0.7);
+        margin-top: 30px;
+        margin-bottom: 18px;
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .cm-table-wrapper {
+        margin-top: 10px;
+    }
+
+    .cm-table {
+        background-color: #ffffff;
+        color: var(--cm-text-main);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+    }
+
+        .cm-table thead {
+            background-color: var(--cm-pink-soft);
+        }
+
+        .cm-table th {
+            text-align: center;
+            font-weight: 600;
+            color: #555;
+            border-bottom-color: var(--cm-border-soft);
+        }
+
+        .cm-table td {
+            vertical-align: middle;
+            font-size: 0.95rem;
+            border-top-color: #f4f4f4;
+        }
+
+        .cm-table tbody tr:nth-child(even) {
+            background-color: #fff8fc;
+        }
+
+        .cm-table tbody tr:hover {
+            background-color: #ffe1f0;
+            transition: 0.2s;
+        }
+
+    .rating-stars {
+        color: #ffc107;
+        font-size: 1rem;
+    }
+
+    .btn-danger {
+        background-color: #ffe5ea;
+        color: #e55353;
+        border-color: #e55353;
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+        .btn-danger:hover {
+            background-color: #e55353;
+            color: #ffffff;
+        }
+</style>
+
+<h2 class="cm-title"> Quản lý đánh giá phim</h2>
+
+<div class="cm-table-wrapper container">
+    <table class="table table-bordered table-hover cm-table">
+        <thead>
+            <tr>
+                <th> Phim</th>
+                <th👤 Người dùng</th>
+                <th> Số sao</th>
+                <th> Bình luận</th>
+                <th> Ngày tạo</th>
+                <th> Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.Event?.Title</td>
+                    <td>@r.UserName</td>
+                    <td class="text-center">
+                        <span class="rating-stars">
+                            @for (int i = 0; i < r.Rating; i++)
+                            {
+                                @:
+                            }
+                        </span>
+                    </td>
+                    <td>@r.Comment</td>
+                    <td>@r.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="text-center">
+                        <form method="post"
+                              asp-action="DeleteRating"
+                              asp-controller="Dashboard"
+                              asp-area="Admin"
+                              onsubmit="return confirm('Xác nhận xóa đánh giá này?');">
+                            <input type="hidden" name="id" value="@r.Id" />
+                            <button type="submit" class="btn btn-danger"> Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

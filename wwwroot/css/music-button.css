@@ -1,0 +1,34 @@
+.music-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #f39c12;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    z-index: 9999;
+    cursor: pointer;
+    box-shadow: 0 0 10px #f39c12;
+    transition: transform 0.3s ease-in-out;
+}
+
+    .music-button.playing {
+        animation: spin 3s linear infinite;
+        background-color: #2ecc71;
+    }
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

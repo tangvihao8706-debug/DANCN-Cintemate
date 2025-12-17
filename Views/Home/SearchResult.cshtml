@@ -1,0 +1,19 @@
+﻿@model List<EventManager.Models.EventModel>
+
+<h2>Kết quả tìm kiếm</h2>
+
+@if (!Model.Any())
+{
+    <p>Không tìm thấy sự kiện phù hợp.</p>
+}
+else
+{
+    <ul>
+        @foreach (var item in Model)
+        {
+            <li>
+                <strong>@item.Title</strong> - @item.Date.ToShortDateString()
+            </li>
+        }
+    </ul>
+}

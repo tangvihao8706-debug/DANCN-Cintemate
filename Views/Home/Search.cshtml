@@ -1,0 +1,198 @@
+﻿@model List<EventManager.Models.EventModel>
+@{
+    ViewData["Title"] = "Kết quả tìm kiếm";
+}
+
+<section class="container my-5 py-4 cm-search-result">
+    <h2 class="text-center fw-bold fs-1 cm-search-title mb-5">
+        Kết quả tìm kiếm cho:
+        <span class="cm-search-key">"@ViewBag.Query"</span>
+    </h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center border-0 cm-search-empty">
+            Không tìm thấy phim phù hợp với từ khóa bạn nhập.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                var startUtc = item.Date.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+                var endUtc = item.Date.AddHours(3).ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+                var gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+                $"&text={Uri.EscapeDataString(item.Title)}" +
+                $"&dates={startUtc}/{endUtc}" +
+                $"&details={Uri.EscapeDataString(item.Description)}" +
+                $"&location={Uri.EscapeDataString(item.Location)}" +
+                "&sf=true&output=xml";
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 cm-movie-card">
+                        <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
+                           class="text-decoration-none text-dark">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold cm-movie-title">@item.Title</h5>
+
+                                @* Poster / ảnh phim, không dùng video *@
+                                @{
+                                    var mediaPath = item.MediaPath;
+                                    var isVideo = !string.IsNullOrEmpty(mediaPath) &&
+                                    (mediaPath.EndsWith(".mp4") || mediaPath.EndsWith(".webm"));
+                                    var posterSrc = string.IsNullOrEmpty(mediaPath) || isVideo
+                                    ? "/images/movies/default-poster.jpg"
+                                    : mediaPath;
+                                }
+
+                                <img src="@posterSrc" class="img-fluid rounded mb-3 cm-movie-img" alt="Poster phim" />
+
+                                <ul class="list-unstyled small cm-movie-meta">
+                                    <li><strong> Rạp:</strong> @item.Location</li>
+                                    <li><strong> Ngày chiếu:</strong> @item.Date.ToString("dd/MM/yyyy")</li>
+                                    <li><strong> Giá vé:</strong> @item.TicketPrice.ToString("N0") VNĐ</li>
+                                </ul>
+
+                                <p class="cm-countdown mt-2 countdown"
+                                   data-date="@item.Date.ToString("yyyy-MM-ddTHH:mm:ss")">
+                                    ⏳ Còn lại: <span class="time">Đang tải...</span>
+                                </p>
+                            </div>
+                        </a>
+                        <div class="card-footer bg-white border-0 text-center d-flex flex-column gap-2">
+                            <a href="/Event/Register/@item.Id" class="btn cm-btn-primary w-100 fw-semibold">
+                                 Đặt vé ngay
+                            </a>
+                            <a href="@gcalUrl" target="_blank" class="btn cm-btn-outline w-100 fw-semibold">
+                                 Thêm vào Google Calendar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-text-main: #333;
+    }
+
+    .cm-search-result {
+        background: transparent;
+    }
+
+    .cm-search-title {
+        color: var(--cm-text-main);
+    }
+
+    .cm-search-key {
+        color: var(--cm-pink-strong);
+        text-shadow: 0 0 8px rgba(255, 182, 210, 0.7);
+    }
+
+    .cm-search-empty {
+        background: #fff9e6;
+        color: #9c6a00;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(255, 200, 120, 0.35);
+    }
+
+    .cm-movie-card {
+        background-color: #ffffff;
+        border-radius: 18px;
+        border: 1px solid var(--cm-border-soft);
+        box-shadow: 0 10px 26px rgba(255, 160, 200, 0.35);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+        .cm-movie-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(255, 160, 200, 0.55);
+        }
+
+    .cm-movie-title {
+        color: var(--cm-pink-strong);
+        margin-bottom: 0.5rem;
+    }
+
+    .cm-movie-img {
+        max-height: 260px;
+        object-fit: cover;
+        width: 100%;
+        border-radius: 14px;
+    }
+
+    .cm-movie-meta li {
+        margin-bottom: 3px;
+        color: #555;
+    }
+
+    .cm-countdown {
+        font-size: 0.9rem;
+        color: #ff5f5f;
+        font-weight: 500;
+    }
+
+    .cm-btn-primary {
+        background-color: var(--cm-pink-main);
+        border: none;
+        color: #fff;
+        border-radius: 999px;
+        box-shadow: 0 10px 24px rgba(255, 143, 188, 0.75);
+    }
+
+        .cm-btn-primary:hover {
+            background-color: var(--cm-pink-strong);
+        }
+
+    .cm-btn-outline {
+        border-radius: 999px;
+        border: 1.5px solid var(--cm-pink-main);
+        color: var(--cm-pink-main);
+        background: #fff;
+    }
+
+        .cm-btn-outline:hover {
+            background: var(--cm-pink-main);
+            color: #fff;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const countdowns = document.querySelectorAll(".countdown");
+
+            countdowns.forEach(el => {
+                const timeSpan = el.querySelector(".time");
+                const targetDate = new Date(el.dataset.date);
+
+                const update = () => {
+                    const now = new Date();
+                    const diff = targetDate - now;
+
+                    if (diff <= 0) {
+                        timeSpan.textContent = "Đã chiếu!";
+                        return;
+                    }
+
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+                    timeSpan.textContent = `${days} ngày ${hours} giờ ${minutes} phút`;
+                };
+
+                update();
+                setInterval(update, 60000);
+            });
+        });
+    </script>
+}

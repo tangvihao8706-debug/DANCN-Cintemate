@@ -1,0 +1,418 @@
+﻿@model EventManager.Models.EventModel
+@{
+    ViewData["Title"] = "Chi tiết phim";
+}
+
+<style>
+    body {
+        background: linear-gradient(145deg, #ffeaf5, #ffffff);
+        color: #333;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .container {
+        max-width: 900px;
+    }
+
+    .movie-wrapper {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 2rem 2.2rem;
+        margin: 2.5rem auto;
+        box-shadow: 0 14px 35px rgba(255, 160, 200, 0.35);
+        border: 1px solid #ffd6eb;
+    }
+
+    .event-header {
+        border-bottom: 1px solid #ffd1e8;
+        padding-bottom: 1rem;
+        margin-bottom: 1.8rem;
+    }
+
+    .event-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #ff6fa6;
+        text-shadow: 0 0 10px rgba(255, 182, 210, 0.75);
+        letter-spacing: 0.5px;
+    }
+
+    .event-meta p {
+        margin: 0;
+        line-height: 1.7;
+        font-size: 1rem;
+        color: #555;
+    }
+
+    .event-meta strong {
+        color: #ff4f93;
+    }
+
+    .event-section {
+        margin-bottom: 1.8rem;
+    }
+
+    .section-title {
+        color: #ff4f93;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 0.6rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .section-title::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: #ff9fcf;
+        }
+
+    .event-image,
+    iframe {
+        width: 100%;
+        border-radius: 16px;
+        box-shadow: 0 12px 28px rgba(255, 167, 209, 0.55);
+        border: 1px solid #ffd5eb;
+    }
+
+    .schedule-box {
+        background: #fff7fc;
+        border: 1px solid #ffd1e8;
+        border-radius: 14px;
+        padding: 1rem;
+        overflow-x: auto;
+        font-size: 0.95rem;
+    }
+
+    /* Nút hành động */
+    .btn-register {
+        margin-top: 1.5rem;
+    }
+
+    .btn-primary {
+        background-color: #ff7fb6;
+        border-color: #ff7fb6;
+        font-weight: 600;
+        border-radius: 999px;
+        padding: 0.55rem 1.4rem;
+        box-shadow: 0 10px 22px rgba(255, 143, 188, 0.55);
+    }
+
+        .btn-primary:hover {
+            background-color: #ff5f9f;
+            border-color: #ff5f9f;
+            box-shadow: 0 14px 30px rgba(255, 143, 188, 0.8);
+        }
+
+    .btn-warning {
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .btn-danger {
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .btn-outline-light,
+    .btn-outline-light:hover {
+        color: #ff4f93;
+        border-color: #ffb6d9;
+        background-color: #fff;
+        border-radius: 999px;
+        font-weight: 500;
+    }
+
+    .btn-success {
+        background-color: #ff8fbf;
+        border-color: #ff8fbf;
+        border-radius: 999px;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(255, 143, 191, 0.5);
+    }
+
+        .btn-success:hover {
+            background-color: #ff6fa6;
+            border-color: #ff6fa6;
+        }
+
+    /* Star rating */
+    .star-rating {
+        direction: rtl;
+        unicode-bidi: bidi-override;
+        display: inline-flex;
+        margin-bottom: 0.5rem;
+    }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 2rem;
+            color: #e0b3c8;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 0 2px;
+        }
+
+            .star-rating label:before {
+                content: "★";
+            }
+
+            .star-rating label:hover,
+            .star-rating label:hover ~ label {
+                color: #ffc107;
+            }
+
+        .star-rating input:checked ~ label {
+            color: #e0b3c8;
+        }
+
+        .star-rating input:checked + label,
+        .star-rating input:checked + label ~ label {
+            color: #ffc107;
+        }
+
+    /* Lọc đánh giá */
+    .star-filter {
+        border-radius: 999px;
+        font-size: 0.9rem;
+    }
+
+    .btn-outline-warning.star-filter {
+        border-color: #ffcf6f;
+        color: #ff9f2f;
+    }
+
+        .btn-outline-warning.star-filter:hover {
+            background-color: #ffe4a3;
+            color: #ff8f1f;
+        }
+
+    /* Card đánh giá */
+    .rating-card {
+        background: #fff9fc;
+        border-radius: 14px;
+        border: 1px solid #ffd6eb;
+        padding: 0.9rem 1rem;
+        margin-bottom: 0.8rem;
+    }
+
+        .rating-card small {
+            color: #888;
+        }
+</style>
+
+<div class="container">
+    <div class="movie-wrapper">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+
+        <!-- 🌟 Tiêu đề phim -->
+        <div class="event-header">
+            <h1 class="event-title">@Model.Title</h1>
+            <div class="event-meta mt-2">
+                <p><strong> Rạp :</strong> @Model.Location</p>
+                <p><strong> Ngày chiếu:</strong> @Model.Date</p>
+                <p><strong> Giá vé:</strong> @Model.TicketPrice.ToString("N0") VNĐ</p>
+
+                @if (!string.IsNullOrEmpty(Model.StartTime) && !string.IsNullOrEmpty(Model.EndTime))
+                {
+                    <p><strong> Suất chiếu:</strong> @Model.StartTime – @Model.EndTime</p>
+                }
+                @if (!string.IsNullOrEmpty(Model.Artists))
+                {
+                    <p><strong> Diễn viên / Đạo diễn:</strong> @Model.Artists</p>
+                }
+            </div>
+        </div>
+
+        <!-- 📝 Mô tả phim -->
+        <div class="event-section">
+            <h4 class="section-title"> Tóm tắt nội dung</h4>
+            <p>@Model.Description</p>
+        </div>
+
+        <!-- 📷 Poster / hình ảnh phim -->
+        @if (!string.IsNullOrEmpty(Model.MediaPath))
+        {
+            <div class="event-section">
+                <h4 class="section-title"> Hình ảnh phim</h4>
+                <img src="@Model.MediaPath" class="event-image" alt="" C:\Users\HP\Pictures\poster_dai_chien_nguoi_khong_lo_7.jpg"" />
+            </div>
+        }
+
+        <!-- 🗺️ Bản đồ rạp -->
+        @if (!string.IsNullOrEmpty(Model.MapEmbedUrl))
+        {
+            <div class="event-section">
+                <h4 class="section-title"> Bản đồ rạp chiếu</h4>
+                <iframe src="@Model.MapEmbedUrl" height="300" style="border:0;" allowfullscreen loading="lazy"></iframe>
+            </div>
+        }
+
+        <!-- 🗓️ Lịch chiếu / lịch trình -->
+        @if (!string.IsNullOrEmpty(Model.ScheduleHtml))
+        {
+            <div class="event-section">
+                <h4 class="section-title"> Lịch chiếu</h4>
+                <div class="schedule-box">
+                    @Html.Raw(Model.ScheduleHtml)
+                </div>
+            </div>
+        }
+
+        <!-- 🔗 Mạng xã hội -->
+        @if (!string.IsNullOrEmpty(Model.FacebookUrl) || !string.IsNullOrEmpty(Model.YoutubeUrl))
+        {
+            <div class="event-section social-buttons">
+                <h4 class="section-title"> Theo dõi phim / rạp</h4>
+                @if (!string.IsNullOrEmpty(Model.FacebookUrl))
+                {
+                    <a href="@Model.FacebookUrl" class="btn btn-primary me-2 mb-2" target="_blank">
+                        <i class="bi bi-facebook"></i> Facebook
+                    </a>
+                }
+                @if (!string.IsNullOrEmpty(Model.YoutubeUrl))
+                {
+                    <a href="@Model.YoutubeUrl" class="btn btn-danger mb-2" target="_blank">
+                        <i class="bi bi-youtube"></i> YouTube
+                    </a>
+                }
+            </div>
+        }
+
+        <!-- 🎟️ Nút hành động -->
+        <div class="btn-register">
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <p class="text-warning">
+                    Vui lòng <a asp-controller="Account" asp-action="Login">Dăng nhập</a> để đặt vé.
+                </p>
+            }
+            else if ((bool?)ViewBag.EventFull == true)
+            {
+                <button class="btn btn-danger btn-lg me-2" disabled>
+                    <i class="bi bi-x-octagon me-1"></i> Rạp đã đầy
+                </button>
+            }
+            else if ((bool?)ViewBag.AlreadyRegistered == true)
+            {
+                <form asp-action="CancelRegistration" method="post" style="display:inline;">
+                    <input type="hidden" name="eventId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-warning btn-lg me-2">
+                        <i class="bi bi-check-circle me-1"></i> Bạn đã đặt vé (Huỷ)
+                    </button>
+                </form>
+            }
+            else
+            {
+                <form asp-action="Register" method="get" style="display:inline;">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-primary btn-lg me-2">
+                        <i class="bi bi-ticket-fill me-1"></i> Đặt vé ngay
+                    </button>
+                </form>
+            }
+
+            <a href="@ViewData["gcalUrl"]" target="_blank" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-calendar-plus me-1"></i> Thêm vào lịch
+            </a>
+        </div>
+
+        <!-- 🌟 Đánh giá phim -->
+        <div class="event-section mt-4">
+            <h4 class="section-title"> Đánh giá phim bạn vừa xem</h4>
+
+            <form method="post" asp-action="SubmitRating" asp-controller="Event">
+                <input type="hidden" name="EventId" value="@Model.Id" />
+
+                <div class="star-rating">
+                    @for (int i = 5; i >= 1; i--)
+                    {
+                        <input type="radio" id="star@i" name="Rating" value="@i" required />
+                        <label for="star@i" title="@i sao"></label>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label for="Comment" class="form-label">Bình luận:</label>
+                    <textarea name="Comment" class="form-control" rows="3" placeholder="Cảm nghĩ của bạn về phim..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success">Gửi đánh giá</button>
+            </form>
+        </div>
+
+        <!-- ⭐ Bộ lọc đánh giá -->
+        <div class="event-section">
+            <h4 class="section-title"> Lọc đánh giá theo sao</h4>
+            <div>
+                @for (int i = 5; i >= 1; i--)
+                {
+                    <button class="btn btn-outline-warning star-filter me-2 mb-2" data-star="@i">@i ⭐</button>
+                }
+                <button class="btn btn-outline-light mb-2" data-star="0">Tất cả</button>
+            </div>
+
+            @if (ViewBag.StarFilter != null)
+            {
+                <p class="text-info mt-2">
+                     Đang hiển thị đánh giá với <strong>@ViewBag.StarFilter ⭐</strong>
+                    <a href="@Url.Action("Details", "Event", new { id = Model.Id })" class="btn btn-sm btn-outline-secondary ms-2">Bỏ lọc</a>
+                </p>
+            }
+        </div>
+
+        <!-- 💬 Các đánh giá đã gửi -->
+        @if (ViewBag.Ratings != null)
+        {
+            <div class="event-section">
+                <h4 class="section-title"> Đánh giá từ người xem</h4>
+
+                @foreach (var r in ViewBag.Ratings)
+                {
+                    <div class="rating-card">
+                        <div class="mb-1">
+                            <strong>@r.UserName</strong> đánh giá:
+                            <span style="color: #ffc107;">
+                                @for (int i = 0; i < r.Rating; i++)
+                                {
+                                    @:⭐
+                                }
+                            </span>
+                        </div>
+                        <p>@r.Comment</p>
+                        <small>🕒 @r.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll(".star-filter").forEach(btn => {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                const star = this.getAttribute("data-star");
+                const eventId = "@Model.Id";
+                const url = star === "0"
+                    ? `/Event/Details/${eventId}`
+                    : `/Event/Details/${eventId}?starFilter=${star}`;
+                window.location.href = url;
+            });
+        });
+    </script>
+}

@@ -1,0 +1,184 @@
+﻿@model EventManager.Models.EventModel
+@{
+    ViewData["Title"] = "Thêm / Sửa phim";
+}
+
+<style>
+    :root {
+        --pink-main: #ff7fb6;
+        --pink-light: #ffeaf5;
+        --pink-strong: #ff4f93;
+        --text-main: #333;
+        --border-soft: #ffd6eb;
+    }
+
+    body {
+        background: linear-gradient(135deg, #ffeaf5, #ffffff);
+        color: var(--text-main);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .form-container {
+        max-width: 720px;
+        margin: 60px auto;
+        padding: 40px;
+        border-radius: 20px;
+        background: #ffffff;
+        border: 1px solid var(--border-soft);
+        box-shadow: 0 10px 30px rgba(255, 174, 206, 0.4);
+    }
+
+    h2 {
+        color: var(--pink-strong);
+        text-shadow: 0 0 12px rgba(255, 174, 206, 0.6);
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 700;
+    }
+
+    label {
+        font-weight: 600;
+        color: #444;
+    }
+
+    .form-control {
+        background-color: #fff;
+        border: 1.5px solid var(--border-soft);
+        color: var(--text-main);
+        border-radius: 10px;
+        padding: 10px 15px;
+        transition: all 0.25s ease;
+    }
+
+        .form-control:focus {
+            border-color: var(--pink-main);
+            box-shadow: 0 0 0 0.12rem rgba(255, 127, 182, 0.35);
+            outline: none;
+        }
+
+    .btn-save {
+        width: 100%;
+        border: none;
+        padding: 14px;
+        font-weight: bold;
+        font-size: 16px;
+        border-radius: 30px;
+        background: var(--pink-main);
+        color: white;
+        box-shadow: 0 10px 24px rgba(255, 143, 188, 0.7);
+        transition: all 0.3s ease-in-out;
+    }
+
+        .btn-save:hover {
+            background: var(--pink-strong);
+            transform: scale(1.04);
+            box-shadow: 0 12px 32px rgba(255, 110, 170, 0.8);
+        }
+
+    .media-preview {
+        max-height: 260px;
+        margin-top: 15px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(255, 143, 188, 0.6);
+    }
+
+    .warning-text {
+        color: #d9534f;
+        font-size: 0.9rem;
+        font-style: italic;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="form-container">
+    <h2>@ViewData["Title"]</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label> Tiêu đề phim</label>
+            <input asp-for="Title" class="form-control" placeholder="Nhập tên phim" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label> Mô tả</label>
+            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Giới thiệu nội dung phim..."></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label> Thể loại</label>
+            <select asp-for="GenreId" asp-items="ViewBag.Genres" class="form-control">
+                <option value="0">-- Chọn thể loại --</option>
+            </select>
+            <span asp-validation-for="GenreId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label> Ngày chiếu</label>
+            <input asp-for="Date" type="date" class="form-control" />
+            <span asp-validation-for="Date" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label> Rạp / Phòng chiếu</label>
+            <input asp-for="Location" class="form-control" placeholder="Ví dụ: CGV Vincom, Lotte..." />
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 row">
+            <div class="col-md-6">
+                <label> Giờ bắt đầu</label>
+                <input asp-for="StartTime" class="form-control" placeholder="18:00" />
+            </div>
+
+            <div class="col-md-6">
+                <label> Giờ kết thúc</label>
+                <input asp-for="EndTime" class="form-control" placeholder="20:00" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label> Đạo diễn / Diễn viên</label>
+            <input asp-for="Artists" class="form-control" placeholder="Ví dụ: Nolan, Tom Hardy..." />
+        </div>
+
+        <div class="mb-3">
+            <label>Số ghế tối đa</label>
+            <input asp-for="MaxParticipants" class="form-control" />
+            <span asp-validation-for="MaxParticipants" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label>🗺 Google Maps Embed URL</label>
+            <input asp-for="MapEmbedUrl" class="form-control" placeholder="https://maps.google.com/..." />
+        </div>
+
+        <div class="mb-3">
+            <label> Poster phim (chỉ hình ảnh)</label>
+            <input type="file" name="mediaFile" class="form-control" accept="image/*" />
+        </div>
+
+        @* Ảnh preview *@
+        @if (!string.IsNullOrEmpty(Model.MediaPath))
+        {
+            <div class="text-center mt-3">
+                @if (Model.MediaPath.EndsWith(".mp4") || Model.MediaPath.EndsWith(".webm"))
+                {
+                    <div class="warning-text">File cũ là video — hệ thống mới chỉ dùng ảnh.</div>
+                    <video class="media-preview" controls>
+                        <source src="@Model.MediaPath" type="video/mp4" />
+                    </video>
+                }
+                else
+                {
+                    <img src="@Model.MediaPath" class="media-preview img-fluid" />
+                }
+            </div>
+        }
+
+        <button type="submit" class="btn-save mt-4"> Lưu phim</button>
+    </form>
+</div>

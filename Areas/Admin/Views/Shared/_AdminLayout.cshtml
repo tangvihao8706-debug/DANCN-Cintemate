@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CineMate Admin</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <style>
+        :root {
+            --pink-main: #ff7fb6;
+            --pink-light: #ffeaf5;
+            --pink-strong: #ff4f93;
+            --pink-soft-border: #ffd6eb;
+            --text-main: #333;
+        }
+
+        body {
+            background: #fff;
+            color: var(--text-main);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 240px;
+            background: #ffffff;
+            border-right: 1px solid var(--pink-soft-border);
+            box-shadow: 4px 0 10px rgba(255, 143, 188, 0.15);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 80px;
+        }
+
+            .sidebar a {
+                display: block;
+                padding: 14px 20px;
+                font-size: 16px;
+                text-decoration: none;
+                color: var(--text-main);
+                border-bottom: 1px solid #f4f4f4;
+                transition: 0.25s;
+            }
+
+                .sidebar a:hover {
+                    background: var(--pink-light);
+                    color: var(--pink-strong);
+                }
+
+            .sidebar .active {
+                background: var(--pink-main);
+                color: white !important;
+                font-weight: 600;
+            }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--pink-soft-border);
+            box-shadow: 0 4px 12px rgba(255, 143, 188, 0.25);
+            position: fixed;
+            top: 0;
+            left: 240px;
+            width: calc(100% - 240px);
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: var(--pink-strong) !important;
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        /* ===== CONTENT WRAPPER ===== */
+        .admin-wrapper {
+            margin-left: 240px;
+            padding: 100px 40px 40px 40px;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            margin-top: 40px;
+            padding: 12px 0;
+            background: #ffffff;
+            border-top: 1px solid var(--pink-soft-border);
+            text-align: center;
+            font-size: 0.9rem;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <a asp-controller="Dashboard" asp-action="Index"> Bảng điều khiển</a>
+
+        <a asp-controller="Movie" asp-action="Index" class="active"> Danh sách phim</a>
+       
+    </div>
+
+    <!-- NAV -->
+    <nav class="navbar px-4 py-2">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand"
+               asp-controller="Dashboard"
+               asp-action="Index">
+                CineMate Admin
+            </a>
+
+            <a asp-area="" asp-controller="Home" asp-action="Index"
+               class="btn btn-danger">
+                Về trang người dùng
+            </a>
+            </a>
+        </div>
+    </nav>
+
+    <!-- PAGE CONTENT -->
+    <div class="admin-wrapper">
+        @RenderBody()
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        &copy; @DateTime.Now.Year - CineMate Admin Panel
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,182 @@
+﻿@model List<EventManager.Models.EventModel>
+@{
+    ViewData["Title"] = "Quản lý phim / suất chiếu";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-text-main: #333333;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #ffeaf5, #ffffff);
+        color: var(--cm-text-main);
+    }
+
+    h2 {
+        color: var(--cm-pink-strong);
+        text-shadow: 0 0 10px rgba(255, 190, 210, 0.7);
+        margin-top: 30px;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .btn {
+        font-weight: 600;
+        border-radius: 999px;
+        padding: 8px 18px;
+        transition: 0.25s ease;
+        border-width: 1.5px;
+        font-size: 0.9rem;
+    }
+
+    .btn-add {
+        background-color: var(--cm-pink-main);
+        color: #fff;
+        border-color: var(--cm-pink-main);
+        box-shadow: 0 8px 18px rgba(255, 143, 188, 0.6);
+    }
+
+        .btn-add:hover {
+            background-color: var(--cm-pink-strong);
+            border-color: var(--cm-pink-strong);
+            box-shadow: 0 10px 22px rgba(255, 110, 170, 0.7);
+        }
+
+    .btn-back {
+        background-color: #ffffff;
+        color: var(--cm-pink-main);
+        border-color: var(--cm-pink-main);
+    }
+
+        .btn-back:hover {
+            background-color: var(--cm-pink-main);
+            color: #ffffff;
+        }
+
+    .btn-warning {
+        background-color: #fff7e0;
+        color: #f0a000;
+        border-color: #f0a000;
+        box-shadow: none;
+        padding: 4px 10px;
+    }
+
+        .btn-warning:hover {
+            background-color: #f0a000;
+            color: #ffffff;
+        }
+
+    .btn-danger {
+        background-color: #ffe5ea;
+        color: #e55353;
+        border-color: #e55353;
+        padding: 4px 10px;
+    }
+
+        .btn-danger:hover {
+            background-color: #e55353;
+            color: #ffffff;
+        }
+
+    .table-wrapper {
+        margin-top: 20px;
+    }
+
+    .table {
+        background-color: #ffffff;
+        color: var(--cm-text-main);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.05);
+    }
+
+        .table thead {
+            background-color: var(--cm-pink-soft);
+        }
+
+        .table th {
+            color: #555;
+            border-bottom-color: var(--cm-border-soft);
+            font-weight: 600;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-top-color: #f4f4f4;
+            font-size: 0.95rem;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #fff8fc;
+        }
+
+        .table tbody tr:hover {
+            background-color: #ffe1f0;
+            transition: 0.2s;
+        }
+
+    .mb-3 {
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 16px;
+    }
+</style>
+
+<h2> Danh sách phim / suất chiếu</h2>
+
+<div class="mb-3">
+    <a class="btn btn-add" href="/Admin/Dashboard/CreateEvent"> Thêm phim</a>
+    <a class="btn btn-back ms-2" href="/Admin/Dashboard/Index"> Quay lại Dashboard</a>
+</div>
+
+<div class="table-wrapper container">
+    <table class="table table-bordered">
+        <thead>
+            <tr class="text-center">
+                <th>Tiêu đề phim</th>
+                <th>Ngày chiếu</th>
+                <th>Rạp / Phòng chiếu</th>
+                <th>Giá vé</th>
+                <th style="width: 110px;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Model)
+            {
+                <tr>
+                    <td>@e.Title</td>
+                    <td>@e.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@e.Location</td>
+                    <td>@e.TicketPrice.ToString("N0") VNĐ</td>
+                    <td class="text-center">
+                        <a asp-area="Admin"
+                           asp-controller="Dashboard"
+                           asp-action="EditEvent"
+                           asp-route-id="@e.Id"
+                           class="btn btn-warning btn-sm"
+                           title="Sửa">
+                            
+                        </a>
+                        <form asp-area="Admin"
+                              asp-controller="Dashboard"
+                              asp-action="DeleteEvent"
+                              asp-route-id="@e.Id"
+                              method="post"
+                              class="d-inline"
+                              onsubmit="return confirm('Xác nhận xoá phim / suất chiếu này?');">
+                            <button class="btn btn-danger btn-sm" title="Xoá"></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

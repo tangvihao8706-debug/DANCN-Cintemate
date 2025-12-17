@@ -1,0 +1,124 @@
+﻿@model EventManager.Models.EventModel
+
+@{
+    var item = Model;
+    var startUtc = item.Date.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+    var endUtc = item.Date.AddHours(3).ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+    var gcalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+                  $"&text={Uri.EscapeDataString(item.Title)}" +
+                  $"&dates={startUtc}/{endUtc}" +
+                  $"&details={Uri.EscapeDataString(item.Description)}" +
+                  $"&location={Uri.EscapeDataString(item.Location)}" +
+                  "&sf=true&output=xml";
+
+    var mediaPath = item.MediaPath;
+    var isVideo = !string.IsNullOrEmpty(mediaPath) &&
+                  (mediaPath.EndsWith(".mp4") || mediaPath.EndsWith(".webm"));
+    var posterSrc = string.IsNullOrEmpty(mediaPath) || isVideo
+        ? "/images/movies/default-poster.jpg"
+        : mediaPath;
+}
+
+<div class="col-lg-4 col-md-6 mb-4">
+    <div class="card h-100 shadow event-card">
+        <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
+           class="text-decoration-none text-dark">
+            <div class="card-body">
+                <h5 class="card-title fw-bold cm-movie-title">@item.Title</h5>
+
+                <img src="@posterSrc" class="img-fluid rounded mb-3 cm-movie-img" alt="Poster phim" />
+
+                <ul class="list-unstyled small cm-movie-meta">
+                    <li><strong> Rạp / địa điểm:</strong> @item.Location</li>
+                    <li><strong> Ngày chiếu:</strong> @item.Date.ToString("dd/MM/yyyy")</li>
+                    <li><strong> Giá vé:</strong> @item.TicketPrice.ToString("N0") VNĐ</li>
+                    <li><strong> Thể loại:</strong> @item.Genre?.Name</li>
+                </ul>
+
+                <p class="cm-countdown mt-2 countdown"
+                   data-date="@item.Date.ToString("yyyy-MM-ddTHH:mm:ss")">
+                     Còn lại: <span class="time">Đang tải...</span>
+                </p>
+            </div>
+        </a>
+
+        <div class="card-footer bg-white border-0 text-center d-flex flex-column gap-2">
+            <a href="/Event/Register/@item.Id" class="btn cm-btn-primary w-100 fw-bold">
+                 Đặt vé ngay
+            </a>
+            <a href="@gcalUrl" class="btn cm-btn-outline w-100 fw-semibold" target="_blank">
+                Thêm vào lịch Google
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-text-main: #333;
+    }
+
+    .event-card {
+        background-color: #ffffff !important;
+        border-radius: 18px !important;
+        border: 1px solid var(--cm-border-soft) !important;
+        box-shadow: 0 10px 26px rgba(255, 160, 200, 0.35);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(255, 160, 200, 0.6);
+        }
+
+    .cm-movie-title {
+        color: var(--cm-pink-strong);
+        margin-bottom: 0.5rem;
+    }
+
+    .cm-movie-img {
+        max-height: 220px;
+        object-fit: cover;
+        width: 100%;
+        border-radius: 14px;
+    }
+
+    .cm-movie-meta li {
+        margin-bottom: 3px;
+        color: #555;
+    }
+
+    .cm-countdown {
+        font-size: 0.9rem;
+        color: #ff5f5f;
+        font-weight: 500;
+    }
+
+    .cm-btn-primary {
+        background-color: var(--cm-pink-main);
+        border: none;
+        color: #fff;
+        border-radius: 999px;
+        box-shadow: 0 10px 24px rgba(255, 143, 188, 0.75);
+    }
+
+        .cm-btn-primary:hover {
+            background-color: var(--cm-pink-strong);
+        }
+
+    .cm-btn-outline {
+        border-radius: 999px;
+        border: 1.5px solid var(--cm-pink-main);
+        color: var(--cm-pink-main);
+        background: #fff;
+    }
+
+        .cm-btn-outline:hover {
+            background: var(--cm-pink-main);
+            color: #fff;
+        }
+</style>

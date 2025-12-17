@@ -1,0 +1,93 @@
+﻿@model List<EventRevenueViewModel>
+@{
+    ViewData["Title"] = "Thống kê doanh thu phim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="display-6 fw-bold pastel-title">
+             Thống Kê Doanh Thu Phim
+        </h2>
+        <p class="text-secondary">Tổng doanh thu dựa trên số vé đặt và giá vé</p>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered pastel-table shadow-sm">
+            <thead class="text-center pastel-thead">
+                <tr>
+                    <th>Tên Phim</th>
+                    <th>Giá Vé</th>
+                    <th>Số Vé Đã Đặt</th>
+                    <th>Tổng Doanh Thu</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.TicketPrice.ToString("N0") VNĐ</td>
+                        <td>@item.CurrentParticipants</td>
+                        <td class="fw-bold text-pink">@item.TotalRevenue.ToString("N0") VNĐ</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+    :root {
+        --pink-main: #ff7fb6;
+        --pink-soft: #ffeaf5;
+        --pink-strong: #ff4f93;
+        --border-soft: #ffd6eb;
+        --text-gray: #555;
+    }
+
+    body {
+        background: #fff;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .pastel-title {
+        color: var(--pink-strong);
+        text-shadow: 0 0 8px rgba(255, 174, 206, 0.5);
+    }
+
+    .pastel-table {
+        border: 1px solid var(--border-soft);
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .pastel-thead {
+        background: var(--pink-soft);
+        color: var(--text-gray);
+        font-weight: 600;
+    }
+
+    .pastel-table th,
+    .pastel-table td {
+        vertical-align: middle;
+        padding: 14px;
+        font-size: 15px;
+        border-color: var(--border-soft);
+    }
+
+    .text-pink {
+        color: var(--pink-strong);
+        font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+        background: #fff7fb;
+    }
+
+    tr:hover {
+        background: #ffe1f0 !important;
+        transition: 0.2s;
+    }
+</style>

@@ -1,0 +1,193 @@
+﻿@model List<EventManager.Models.EventModel>
+
+@{
+    ViewData["Title"] = "Danh sách phim";
+}
+
+<h2 class="cm-page-title"> Tất cả phim</h2>
+
+<!-- FORM TÌM KIẾM -->
+<form method="get" class="text-center mb-4">
+    <input type="text"
+           name="search"
+           value="@Context.Request.Query["search"]"
+           placeholder=" Tìm phim..."
+           class="form-control w-50 mx-auto cm-search-input" />
+    <button type="submit" class="btn cm-btn-primary mt-2">Lọc</button>
+</form>
+
+<!-- FILTER DATA -->
+@{
+    var keyword = Context.Request.Query["search"].ToString().ToLower();
+    var filteredEvents = string.IsNullOrEmpty(keyword)
+        ? Model
+        : Model.Where(e => e.Title.ToLower().Contains(keyword) || e.Description.ToLower().Contains(keyword)).ToList();
+}
+
+<!-- DANH SÁCH PHIM -->
+<div class="row">
+    @foreach (var item in filteredEvents)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4 movie-card">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold movie-title">@item.Title</h5>
+                    <p class="movie-desc text-truncate-3">@item.Description</p>
+                    <ul class="list-unstyled small movie-meta">
+                        <li>
+                            <strong><i class="bi bi-calendar-event-fill me-2"></i>Ngày chiếu:</strong>
+                            @item.Date.ToString("dd/MM/yyyy")
+                        </li>
+                        <li>
+                            <strong><i class="bi bi-geo-alt-fill me-2"></i>Rạp / địa điểm:</strong>
+                            @item.Location
+                        </li>
+                        <li>
+                            <strong><i class="bi bi-currency-dollar me-2"></i>Giá vé:</strong>
+                            @item.TicketPrice.ToString("N0") VNĐ
+                        </li>
+                        <li>
+                            <strong><i class="bi bi-film me-2"></i>Thể loại:</strong>
+                            @item.Genre?.Name
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer movie-card-footer d-flex justify-content-between">
+                    <a href="@Url.Action("Register", "Event", new { id = item.Id })"
+                       class="btn btn-sm cm-btn-outline">
+                        <i class="bi bi-ticket-fill me-1"></i> Đặt vé
+                    </a>
+                    <a href="@Url.Action("Details", "Event", new { id = item.Id })"
+                       class="btn btn-sm cm-btn-light">
+                        <i class="bi bi-info-circle-fill me-1"></i> Chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-text-main: #333333;
+    }
+
+    body {
+        background: linear-gradient(145deg, #ffeaf5, #ffffff);
+        color: var(--cm-text-main);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .cm-page-title {
+        font-weight: 800;
+        font-size: 1.8rem;
+        margin: 1.5rem 0 1rem;
+        color: var(--cm-pink-strong);
+        text-shadow: 0 0 8px rgba(255, 182, 210, 0.7);
+    }
+
+    .cm-search-input {
+        border-radius: 999px;
+        border: 1px solid var(--cm-border-soft);
+        background-color: #fff;
+        box-shadow: 0 6px 16px rgba(255, 160, 200, 0.25);
+    }
+
+        .cm-search-input:focus {
+            box-shadow: 0 0 0 0.15rem rgba(255, 127, 182, 0.35);
+            border-color: var(--cm-pink-main);
+        }
+
+    .cm-btn-primary {
+        background-color: var(--cm-pink-main);
+        border-color: var(--cm-pink-main);
+        color: #fff;
+        border-radius: 999px;
+        padding: 0.4rem 1.3rem;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(255, 143, 188, 0.55);
+    }
+
+        .cm-btn-primary:hover {
+            background-color: #ff5f9f;
+            border-color: #ff5f9f;
+            color: #fff;
+            box-shadow: 0 12px 26px rgba(255, 143, 188, 0.75);
+        }
+
+    .movie-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid var(--cm-border-soft);
+        box-shadow: 0 10px 26px rgba(255, 160, 200, 0.3);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+        .movie-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(255, 160, 200, 0.45);
+        }
+
+    .movie-title {
+        color: var(--cm-pink-strong);
+        margin-bottom: 0.4rem;
+    }
+
+    .movie-desc {
+        font-size: 0.95rem;
+        color: #666;
+    }
+
+    .movie-meta li {
+        margin-bottom: 0.15rem;
+        color: #555;
+    }
+
+    .movie-card-footer {
+        background: linear-gradient(135deg, #ffeaf5, #fff);
+        border-top: 1px solid var(--cm-border-soft);
+        border-radius: 0 0 18px 18px !important;
+        padding: 0.7rem 1rem;
+    }
+
+    .cm-btn-outline {
+        border-radius: 999px;
+        border: 1.5px solid var(--cm-pink-main);
+        color: var(--cm-pink-main);
+        background: #fff;
+        font-weight: 600;
+        padding: 0.3rem 1.1rem;
+    }
+
+        .cm-btn-outline:hover {
+            background: var(--cm-pink-main);
+            color: #fff;
+        }
+
+    .cm-btn-light {
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: var(--cm-pink-soft);
+        color: var(--cm-text-main);
+        font-weight: 600;
+        padding: 0.3rem 1.1rem;
+    }
+
+        .cm-btn-light:hover {
+            background: #fff;
+            border-color: var(--cm-pink-main);
+            color: var(--cm-pink-strong);
+        }
+
+    /* Giới hạn 3 dòng mô tả */
+    .text-truncate-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>

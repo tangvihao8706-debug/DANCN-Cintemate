@@ -1,0 +1,166 @@
+﻿@model List<Microsoft.AspNetCore.Identity.IdentityUser>
+
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success text-center fw-bold mb-3">
+        @Html.Raw(TempData["SuccessMessage"])
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger text-center fw-bold mb-3">
+        @Html.Raw(TempData["ErrorMessage"])
+    </div>
+}
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-text-main: #333;
+    }
+
+    body {
+        background: linear-gradient(135deg, #ffeaf5, #ffffff);
+        color: var(--cm-text-main);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    h2.cm-title {
+        margin-top: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--cm-pink-strong);
+        text-shadow: 0 0 10px rgba(255, 190, 210, 0.7);
+    }
+
+    .user-card {
+        background: #ffffff;
+        border: 1px solid var(--cm-border-soft);
+        border-radius: 16px;
+        padding: 16px 18px;
+        margin-bottom: 18px;
+        box-shadow: 0 10px 24px rgba(255, 160, 200, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .user-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 30px rgba(255, 160, 200, 0.4);
+        }
+
+        .user-card h5 {
+            font-size: 0.98rem;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .user-card p {
+            font-size: 0.88rem;
+            margin-bottom: 10px;
+            color: #777;
+        }
+
+    .btn-role {
+        background: var(--cm-pink-main);
+        color: #ffffff;
+        border: none;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 6px 10px;
+        width: 100%;
+        box-shadow: 0 8px 18px rgba(255, 143, 188, 0.6);
+        transition: 0.2s;
+    }
+
+        .btn-role:hover {
+            background: var(--cm-pink-strong);
+            box-shadow: 0 10px 22px rgba(255, 110, 170, 0.7);
+        }
+
+    .btn-delete {
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 6px 10px;
+        width: 100%;
+    }
+
+    select.form-select {
+        background-color: #ffffff;
+        color: var(--cm-text-main);
+        border-radius: 999px;
+        border: 1.5px solid var(--cm-border-soft);
+        font-size: 0.85rem;
+        padding: 4px 10px;
+        margin-bottom: 8px;
+    }
+
+        select.form-select:focus {
+            border-color: var(--cm-pink-main);
+            box-shadow: 0 0 0 0.12rem rgba(255, 127, 182, 0.35);
+        }
+
+    .alert-success {
+        background-color: #f7e9ff;
+        border: 1px solid var(--cm-border-soft);
+        color: var(--cm-text-main);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+    }
+
+    .alert-danger {
+        background-color: #ffe5ea;
+        border: 1px solid #e55353;
+        color: #b02a37;
+        box-shadow: 0 6px 14px rgba(229, 83, 83, 0.2);
+    }
+</style>
+
+<h2 class="cm-title">Danh sách người dùng</h2>
+
+<div class="container">
+    <div class="row">
+        @foreach (var user in Model)
+        {
+            <div class="col-md-4 col-sm-6">
+                <div class="user-card">
+                    <h5>@user.Email</h5>
+                    <p> @user.UserName</p>
+
+                    <form asp-action="AssignRole" method="post" class="mb-2">
+                        <input type="hidden" name="userId" value="@user.Id" />
+                        <select name="role" class="form-select form-select-sm">
+                            <option disabled selected>Chọn quyền</option>
+                            <option value="User">User</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                        <button type="submit" class="btn btn-role">
+                             Gán quyền
+                        </button>
+                    </form>
+
+                    <form asp-action="DeleteUser"
+                          method="post"
+                          onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này?');">
+                        <input type="hidden" name="id" value="@user.Id" />
+                        <button type="submit"
+                                class="btn btn-outline-danger btn-delete">
+                            Xoá người dùng
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>

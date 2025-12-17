@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Xác nhận thành công";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-success">
+                <div class="card-body text-center">
+                    <h4 class="card-title text-success mb-3">
+                         Tài khoản đã được xác thực!
+                    </h4>
+                    <p class="card-text mb-4">
+                        Cảm ơn bạn đã xác nhận email. Bạn có thể đăng nhập để tiếp tục sử dụng hệ thống.
+                    </p>
+
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-success">
+                         Đăng nhập ngay
+                    </a>
+
+                    <p class="text-muted mt-3">
+                        Tự động chuyển về trang đăng nhập sau 5 giây...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    setTimeout(() => {
+        window.location.href = '@Url.Action("Login", "Account")';
+    }, 5000);
+</script>

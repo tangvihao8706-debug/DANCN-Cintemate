@@ -1,0 +1,362 @@
+﻿@model EventManager.Models.EventModel
+@{
+    ViewData["Title"] = "Đặt vé xem phim";
+    var cardCode = "CARD-" + Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
+    var momoCode = "MOMO-" + Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
+    var zaloCode = "ZALO-" + Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
+    var takenSeats = ViewBag.TakenSeats as List<string> ?? new List<string>();
+    // Định nghĩa danh sách ghế (ví dụ: 5 hàng, mỗi hàng 10 ghế)
+    var allSeats = Enumerable.Range(1, 5).SelectMany(row =>
+        Enumerable.Range(1, 10).Select(col => $"{(char)('A' + row - 1)}{col}")).ToList();
+    var availableSeats = allSeats.Where(s => !takenSeats.Contains(s)).ToList();
+    var selectedSeat = "";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-bg: #fffafd;
+        --cm-text-main: #333333;
+    }
+
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(145deg, #ffeaf5, #ffffff);
+        color: var(--cm-text-main);
+    }
+
+    .card {
+        background: #ffffff;
+        border: 1px solid var(--cm-border-soft);
+        box-shadow: 0 14px 30px rgba(255, 160, 200, 0.35);
+        border-radius: 20px !important;
+    }
+
+    h2, h5 {
+        color: var(--cm-pink-strong);
+        text-shadow: 0 0 8px rgba(255, 182, 210, 0.7);
+    }
+
+    h2 {
+        font-weight: 800;
+        letter-spacing: 0.4px;
+    }
+
+    h5 {
+        font-weight: 600;
+    }
+
+    label, .form-label {
+        color: #555;
+        font-weight: 500;
+    }
+
+    input.form-control, select.form-select {
+        background-color: #ffffff;
+        color: var(--cm-text-main);
+        border: 1px solid var(--cm-border-soft);
+        border-radius: 12px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--cm-pink-main);
+        box-shadow: 0 0 0 0.15rem rgba(255, 127, 182, 0.35);
+    }
+
+    .btn-success {
+        background-color: var(--cm-pink-main);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 999px;
+        box-shadow: 0 10px 24px rgba(255, 143, 188, 0.7);
+    }
+
+        .btn-success:hover {
+            background-color: #ff5f9f;
+            box-shadow: 0 14px 30px rgba(255, 143, 188, 0.9);
+        }
+
+    .form-control.bg-light {
+        background-color: #fff7fc !important;
+        color: #ff7f00 !important;
+        border: 1px solid #ffd08a;
+    }
+
+    .text-danger {
+        color: #e53935 !important;
+    }
+
+    .text-info {
+        color: #ff7f00 !important;
+    }
+
+    .shadow {
+        box-shadow: 0 10px 24px rgba(255, 160, 200, 0.4) !important;
+    }
+
+    a.text-muted:hover {
+        color: var(--cm-pink-main) !important;
+    }
+
+    /* 🎟️ Seat map styles */
+    .seat-map {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 1rem 0;
+        padding: 1rem 0.5rem;
+        background: #fff9fd;
+        border-radius: 16px;
+        border: 1px solid var(--cm-border-soft);
+    }
+
+    .screen {
+        background: #ffe0f0;
+        color: var(--cm-text-main);
+        padding: 0.5rem 2.5rem;
+        border-radius: 999px;
+        margin-bottom: 1rem;
+        text-align: center;
+        width: 80%;
+        font-size: 1.05rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border: 1px solid var(--cm-border-soft);
+    }
+
+    .seat-row {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+
+    .seat {
+        width: 30px;
+        height: 30px;
+        background: #ffffff;
+        border: 1px solid #ffbfdc;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--cm-text-main);
+        transition: all 0.15s ease;
+    }
+
+        .seat.available:hover {
+            background: var(--cm-pink-soft);
+            border-color: var(--cm-pink-main);
+            transform: translateY(-2px);
+        }
+
+        .seat.selected {
+            background: var(--cm-pink-main);
+            border-color: var(--cm-pink-strong);
+            color: #fff;
+            cursor: default;
+        }
+
+        .seat.taken {
+            background: #e0e0e0;
+            border-color: #bdbdbd;
+            cursor: not-allowed;
+            opacity: 0.8;
+            color: #777;
+        }
+
+        .seat.vip {
+            background: #ffeaa7;
+            border-color: #fdcb6e;
+        }
+
+    .seat-info {
+        color: #777;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+        .seat-info i {
+            color: var(--cm-pink-main);
+        }
+
+    /* Thanh toán */
+    #paymentMethod {
+        border-radius: 999px;
+    }
+
+    #momo-fields img,
+    #zalo-fields img {
+        border-radius: 16px;
+    }
+
+    .container.py-5 {
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+
+    .text-muted {
+        color: #888 !important;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-2 fw-bold">Đặt vé xem phim</h2>
+                    <h5 class="text-center mb-4">@Model.Title</h5>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+
+                    <form asp-action="RegisterConfirmed" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="seatNumber" id="selectedSeat" value="" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Họ tên</label>
+                            <input type="text" name="fullName" class="form-control" placeholder="Nguyễn Văn A" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" placeholder="email@domain.com" required />
+                        </div>
+
+                        <!-- 🎟️ Seat map -->
+                        <div class="mb-3 seat-selection">
+                            <label class="form-label">Chọn ghế ngồi</label>
+                            <div class="seat-map">
+                                <div class="screen">MÀN HÌNH</div>
+                                @for (int row = 0; row < 5; row++)
+                                {
+                                    <div class="seat-row">
+                                        @for (int col = 1; col <= 10; col++)
+                                        {
+                                            var seatId = $"{(char)('A' + row)}{col}";
+                                            var isTaken = takenSeats.Contains(seatId);
+                                            var isSelected = seatId == selectedSeat;
+                                            <div class="seat @(isTaken ? "taken" : "available") @(isSelected ? "selected" : "") @(row == 0 ? "vip" : "")"
+                                                 onclick="@(isTaken ? "" : $"selectSeat('{seatId}')")" data-seat="@seatId">
+                                                @col
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            <div class="seat-info">
+                                <i class="bi bi-info-circle"></i>
+                                Ghế <span style="color:#ff7fb6;">hồng</span> là ghế bạn chọn,
+                                ghế <span style="color:#777;">xám</span> đã được đặt,
+                                ghế <span style="color:#f1c40f;">vàng</span> là khu VIP.
+                            </div>
+                        </div>
+
+                        @if (availableSeats.Any())
+                        {
+                            <hr class="my-4" />
+                            <h5 class="mb-3"><i class="bi bi-credit-card"></i> Phương thức thanh toán</h5>
+
+                            <div class="mb-3">
+                                <select name="paymentMethod" class="form-select" required id="paymentMethod" onchange="togglePaymentFields()">
+                                    <option value="">-- Chọn phương thức --</option>
+                                    <option value="Card">Thẻ tín dụng / ghi nợ</option>
+                                    <option value="Momo">Ví Momo</option>
+                                    <option value="ZaloPay">ZaloPay</option>
+                                </select>
+                            </div>
+
+                            <!-- Card -->
+                            <div id="card-fields" style="display: none;">
+                                <div class="mb-3">
+                                    <label class="form-label">Số thẻ</label>
+                                    <input type="text" name="cardNumber" class="form-control" placeholder="1234 5678 9012 3456" />
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Ngày hết hạn</label>
+                                        <input type="text" name="expiryDate" class="form-control" placeholder="MM/YY" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">CVV</label>
+                                        <input type="text" name="cvv" class="form-control" placeholder="123" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mã giao dịch:</label>
+                                    <div class="form-control bg-light text-warning fw-bold">@cardCode</div>
+                                </div>
+                            </div>
+
+                            <!-- Momo -->
+                            <div id="momo-fields" style="display: none;" class="text-center mb-4">
+                                <p class="mb-2">Quét mã QR bằng Momo để thanh toán</p>
+                                <img src=" qrcode-momo.jpg" alt="Momo QR" class="img-fluid rounded shadow" style="max-width: 220px;" />
+                                <div class="mt-3">
+                                    <label class="form-label">Mã thanh toán:</label>
+                                    <div class="form-control bg-light text-danger fw-bold">@momoCode</div>
+                                </div>
+                            </div>
+
+                            <!-- ZaloPay -->
+                            <div id="zalo-fields" style="display: none;" class="text-center mb-4">
+                                <p class="mb-2">Quét mã QR bằng ZaloPay để thanh toán</p>
+                                <img src="/images/qrcode-zalopay.jpg" alt="ZaloPay QR" class="img-fluid rounded shadow" style="max-width: 220px;" />
+                                <div class="mt-3">
+                                    <label class="form-label">Mã thanh toán:</label>
+                                    <div class="form-control bg-light text-info fw-bold">@zaloCode</div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mt-3">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Xác nhận & Thanh toán
+                                </button>
+                            </div>
+                        }
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a asp-action="Index" class="text-muted">
+                            <i class="bi bi-arrow-left"></i> Quay lại danh sách phim
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function selectSeat(seatId) {
+            const seats = document.querySelectorAll('.seat');
+            seats.forEach(seat => {
+                seat.classList.remove('selected');
+                if (seat.dataset.seat === seatId) {
+                    seat.classList.add('selected');
+                }
+            });
+            document.getElementById('selectedSeat').value = seatId;
+        }
+
+        function togglePaymentFields() {
+            const method = document.getElementById("paymentMethod").value;
+            document.getElementById("card-fields").style.display = method === "Card" ? "block" : "none";
+            document.getElementById("momo-fields").style.display = method === "Momo" ? "block" : "none";
+            document.getElementById("zalo-fields").style.display = method === "ZaloPay" ? "block" : "none";
+        }
+    </script>
+}

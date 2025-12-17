@@ -1,0 +1,226 @@
+﻿@{
+    ViewData["Title"] = "Chính sách Bảo mật";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-text-main: #333333;
+    }
+
+    body {
+        background: linear-gradient(145deg, #ffeaf5, #ffffff);
+        font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--cm-text-main);
+        margin: 0;
+        padding: 0;
+    }
+
+    .privacy-container {
+        max-width: 900px;
+        margin: 60px auto;
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 40px 48px;
+        box-shadow: 0 18px 40px rgba(255, 160, 200, 0.45);
+        border: 1px solid var(--cm-border-soft);
+        position: relative;
+        overflow: hidden;
+        animation: fadeSlideUp 0.6s ease forwards;
+    }
+
+    @@keyframes fadeSlideUp {
+        0% {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .privacy-title {
+        font-size: 2.4rem;
+        font-weight: 800;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: var(--cm-pink-strong);
+        text-shadow: 0 0 10px rgba(255,180,210,0.7);
+    }
+
+        .privacy-title i {
+            font-size: 2.6rem;
+            color: var(--cm-pink-main);
+        }
+
+    .privacy-subtitle {
+        font-size: 1rem;
+        margin-bottom: 32px;
+        line-height: 1.7;
+        color: #555;
+        border-left: 4px solid var(--cm-pink-main);
+        padding-left: 16px;
+        background: #fff7fc;
+        border-radius: 12px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    section {
+        background: #fff9fd;
+        border-radius: 18px;
+        padding: 22px 24px;
+        margin-bottom: 24px;
+        border: 1px solid var(--cm-border-soft);
+        box-shadow: 0 10px 24px rgba(255, 160, 200, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+        section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 32px rgba(255, 160, 200, 0.4);
+            border-color: var(--cm-pink-main);
+        }
+
+    .privacy-section {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        position: relative;
+        padding-left: 42px;
+        color: var(--cm-pink-strong);
+    }
+
+        .privacy-section span {
+            position: absolute;
+            left: 0;
+            top: -2px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--cm-pink-main);
+        }
+
+    ul {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
+        ul li {
+            font-size: 0.98rem;
+            margin-bottom: 10px;
+            padding-left: 28px;
+            position: relative;
+            color: #555;
+        }
+
+            ul li::before {
+                content: attr(data-icon);
+                position: absolute;
+                left: 0;
+                top: 0;
+                font-size: 1.2rem;
+            }
+
+    section p {
+        font-size: 0.98rem;
+        line-height: 1.8;
+        color: #555;
+        margin-bottom: 0;
+    }
+
+    a.text-cyan {
+        color: var(--cm-pink-strong);
+        font-weight: 600;
+        text-decoration: none;
+        border-bottom: 1px dashed rgba(255,127,182,0.7);
+    }
+
+        a.text-cyan:hover {
+            color: #ff2f8f;
+            border-bottom-style: solid;
+        }
+
+    @@media (max-width: 768px) {
+        .privacy-container {
+            padding: 24px 18px;
+            margin: 24px 12px 40px;
+        }
+
+        .privacy-title {
+            font-size: 2rem;
+        }
+
+        .privacy-section {
+            font-size: 1.2rem;
+            padding-left: 34px;
+        }
+
+            .privacy-section span {
+                font-size: 1.3rem;
+            }
+    }
+</style>
+
+<div class="privacy-container">
+    <h1 class="privacy-title">
+        <i class="fas fa-shield-halved"></i>
+        Chính sách Bảo mật
+    </h1>
+
+    <p class="privacy-subtitle">
+        CineMate cam kết bảo vệ quyền riêng tư và thông tin cá nhân của người dùng. Chính sách này giải thích cách
+        chúng tôi thu thập, sử dụng và bảo vệ dữ liệu khi bạn sử dụng nền tảng đặt vé xem phim của CineMate.
+    </p>
+
+    <section>
+        <h2 class="privacy-section"><span>1.</span> Dữ liệu chúng tôi thu thập</h2>
+        <ul>
+            <li data-icon="">Họ tên, email, số điện thoại</li>
+            <li data-icon="">Thông tin đặt vé, lịch sử giao dịch</li>
+            <li data-icon="">Địa chỉ IP, thiết bị, trình duyệt, thời gian truy cập</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2 class="privacy-section"><span>2.</span> Mục đích sử dụng</h2>
+        <ul>
+            <li data-icon="">Xử lý và quản lý việc đặt vé xem phim</li>
+            <li data-icon="">Gửi email xác nhận, thông tin suất chiếu và thông báo liên quan</li>
+            <li data-icon="">Phân tích, cải thiện trải nghiệm người dùng và chất lượng dịch vụ</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2 class="privacy-section"><span>3.</span> Bảo mật thông tin</h2>
+        <p>
+            Dữ liệu của bạn được lưu trữ trên hệ thống có áp dụng các biện pháp bảo mật phù hợp. Chúng tôi không chia sẻ
+            thông tin cá nhân với bên thứ ba, trừ trường hợp:
+            theo yêu cầu của cơ quan có thẩm quyền; hoặc khi bạn đồng ý chia sẻ để phục vụ một dịch vụ cụ thể.
+        </p>
+    </section>
+
+    <section>
+        <h2 class="privacy-section"><span>4.</span> Quyền của người dùng</h2>
+        <p>
+            Bạn có quyền yêu cầu xem, cập nhật hoặc đề nghị xoá thông tin cá nhân của mình khỏi hệ thống, trong phạm vi
+            pháp luật cho phép. Mọi yêu cầu sẽ được chúng tôi xử lý trong thời gian sớm nhất có thể.
+        </p>
+    </section>
+
+    <section>
+        <h2 class="privacy-section"><span>5.</span> Liên hệ</h2>
+        <p>📧 Email: <a href="mailto:support@cinemate.vn" class="text-cyan">support@cinemate.vn</a></p>
+        <p>📞 Hotline: 1900 123 456</p>
+    </section>
+</div>

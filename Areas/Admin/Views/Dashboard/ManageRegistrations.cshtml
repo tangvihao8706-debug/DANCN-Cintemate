@@ -1,0 +1,133 @@
+﻿@model List<EventManager.Models.Registration>
+@{
+    ViewData["Title"] = "Quản lý vé đã đặt";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-text-main: #333;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #ffeaf5, #ffffff);
+        color: var(--cm-text-main);
+    }
+
+    h2.cm-title {
+        color: var(--cm-pink-strong);
+        text-align: center;
+        margin-top: 32px;
+        font-size: 2rem;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(255, 190, 210, 0.7);
+    }
+
+    .cm-table-wrapper {
+        width: 95%;
+        margin: 20px auto 40px auto;
+    }
+
+    .registration-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+        background: #ffffff;
+    }
+
+        .registration-table thead {
+            background-color: var(--cm-pink-soft);
+            color: #555;
+            font-size: 0.95rem;
+            text-align: left;
+        }
+
+        .registration-table th,
+        .registration-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1dbe7;
+        }
+
+        .registration-table tbody tr:nth-child(even) {
+            background-color: #fff8fc;
+        }
+
+        .registration-table tbody tr:hover {
+            background-color: #ffe1f0;
+            transition: 0.2s;
+        }
+
+    .btn-danger {
+        background-color: #ffe5ea;
+        color: #e55353;
+        border: 1.5px solid #e55353;
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: 0.25s;
+    }
+
+        .btn-danger:hover {
+            background-color: #e55353;
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(229, 83, 83, 0.4);
+        }
+
+    @@media (max-width: 768px) {
+
+        .registration-table thead {
+            font-size: 0.85rem;
+        }
+
+        .registration-table th,
+        .registration-table td {
+            padding: 10px 10px;
+            font-size: 0.85rem;
+        }
+    }
+
+
+</style>
+
+<h2 class="cm-title"> Quản lý vé đã đặt</h2>
+
+<div class="cm-table-wrapper">
+    <table class="registration-table">
+        <thead>
+            <tr>
+                <th> Người dùng</th>
+                <th> Phim / Suất chiếu</th>
+                <th> Ghế</th>
+                <th> Thời gian đặt</th>
+                <th style="width: 90px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.UserId</td>
+                    <td>@r.Event?.Title</td>
+                    <td>@r.SeatNumber</td>
+                    <td>@r.RegisteredAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="text-center">
+                        <form asp-action="DeleteRegistration"
+                              asp-route-id="@r.Id"
+                              method="post"
+                              onsubmit="return confirm('Xoá vé đã đặt này?');">
+                            <button class="btn btn-danger"> Xoá</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

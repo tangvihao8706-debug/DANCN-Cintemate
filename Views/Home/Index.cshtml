@@ -1,0 +1,517 @@
+﻿@using Microsoft.AspNetCore.Http
+@model List<EventManager.Models.EventModel>
+@{
+    ViewData["Title"] = "Trang chủ";
+    var latestEvent = Model.OrderByDescending(e => e.Date).FirstOrDefault();
+    var featuredEvents = ViewBag.FeaturedEvents as List<EventManager.Models.EventModel>;
+    var genres = ViewBag.Genres as SelectList;
+}
+
+<!-- 💬 Thông báo -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success text-center mt-3">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger text-center mt-3">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- 🔔 Thông báo phim mới -->
+@if (latestEvent != null)
+{
+    <div class="cm-marquee">
+        SỰ TRỞ LẠI CỦA TRINH SÁT ĐOÀN. CUỘC PHẢN CÔNG CỦA TITAN THỦY TỔ !
+    </div>
+}
+
+<section class="cm-hero">
+    <div class="container">
+        <div class="cm-slider">
+            @{
+                var slidesSource = (featuredEvents != null && featuredEvents.Any())
+                ? featuredEvents
+                : Model;
+
+                var slideIndex = 0;
+                foreach (var movie in slidesSource.Take(5))
+                {
+                    var isActive = slideIndex == 0 ? "active" : "";
+                    <div class="cm-slide @isActive" data-index="@slideIndex">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <h1 class="cm-hero-title">@movie.Title</h1>
+                                <p class="cm-hero-sub">
+                                    @movie.Description
+                                </p>
+                                <p class="cm-hero-meta">
+                                     @movie.Date.ToString("dd/MM/yyyy") •
+                                    📍 @movie.Location
+                                </p>
+                                <div class="d-flex gap-2 mt-3">
+                                    <a href="@Url.Action("Register", "Event", new { id = movie.Id })"
+                                       class="btn cm-btn-primary">
+                                         Đặt vé ngay
+                                    </a>
+                                    <a href="@Url.Action("Details", "Event", new { id = movie.Id })"
+                                       class="btn cm-btn-light">
+                                         Chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <div class="cm-hero-poster-wrapper">
+                                    <img src="@(string.IsNullOrEmpty(movie.MediaPath) ? "/images/movies/default-poster.jpg" : movie.MediaPath)"
+                                         alt="@movie.Title"
+                                         class="cm-hero-poster" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    slideIndex++;
+                }
+            }
+
+            <div class="cm-slider-dots">
+                @for (int i = 0; i < slidesSource.Take(5).Count(); i++)
+                {
+                    <span class="dot @(i == 0 ? "active" : "")" data-index="@i"></span>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- 🔎 BỘ LỌC PHIM -->
+<section class="container cm-section">
+    <div class="cm-section-header">
+        <h3>Lọc phim</h3>
+    </div>
+    <form method="get" asp-action="Index" class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label for="location" class="form-label"> Rạp </label>
+            <input type="text" name="location" id="location" class="form-control"
+                   placeholder="Nhập địa điểm..." value="@Context.Request.Query["location"]" />
+        </div>
+        <div class="col-md-3">
+            <label for="date" class="form-label"> Ngày chiếu</label>
+            <input type="date" name="date" id="date" class="form-control" value="@Context.Request.Query["date"]" />
+        </div>
+        <div class="col-md-3">
+            <label for="genreId" class="form-label"> Thể loại</label>
+            <select name="genreId" class="form-select" asp-items="genres">
+                <option value="">-- Tất cả thể loại --</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-grid">
+            <button type="submit" class="btn cm-btn-outline-main mt-2 mt-md-0"> Lọc phim</button>
+        </div>
+    </form>
+</section>
+
+<!-- ⭐ PHIM NỔI BẬT -->
+@if (featuredEvents != null && featuredEvents.Any())
+{
+    <section class="cm-section cm-section-alt">
+        <div class="container">
+            <div class="cm-section-header">
+                <h3>Phim nổi bật</h3>
+            </div>
+            <div class="row">
+                @foreach (var item in featuredEvents)
+                {
+                    @Html.Partial("_EventCard", item)
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- 📅 CÁC PHIM KHÁC -->
+<section class="cm-section">
+    <div class="container">
+        <div class="cm-section-header">
+            <h3>Các phim khác</h3>
+        </div>
+        <div class="row">
+            @if (!Model.Any())
+            {
+                <div class="col-12 text-center text-muted">
+                    <p>Hiện chưa có phim phù hợp.</p>
+                </div>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    @Html.Partial("_EventCard", item)
+                }
+            }
+        </div>
+    </div>
+</section>
+
+<!-- 📰 TIN TỨC PHIM (CHỈ HÌNH ẢNH + LINK, KHÔNG VIDEO) -->
+<section class="cm-section cm-section-alt">
+    <div class="container">
+        <div class="cm-section-header">
+            <h3>Tin tức phim ảnh</h3>
+        </div>
+        <p class="text-center mb-4 text-muted">
+            Cập nhật thông tin về các bộ phim hot, trailer mới và tin tức điện ảnh.
+        </p>
+
+        <div class="row">
+            <!-- Card 1 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <a href="https://www.cgv.vn" target="_blank" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0 cm-news-card">
+                        <img src="/images/movies/news1.jpg" class="card-img-top" alt="" https: //www.cgv.vn/media/catalog/product/cache/1/thumbnail/240x388/c88460ec71d04fa96e628a21494d2fd3/w/f/wfg-470x700.jpg"">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Bom tấn mùa lễ hội</h5>
+                            <p class="card-text small">
+                                Danh sách những bộ phim không thể bỏ lỡ trong dịp lễ với nhiều thể loại hấp dẫn.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <a href="https://www.galaxycine.vn" target="_blank" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0 cm-news-card">
+                        <img src="/images/movies/news2.jpg" class="card-img-top" alt="" C:\Users\HP\Pictures\tải xuống.png">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Top phim hoạt hình cho gia đình</h5>
+                            <p class="card-text small">
+                                Những bộ phim hoạt hình ấm áp, phù hợp để xem cùng người thân cuối tuần.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <a href="https://www.imdb.com" target="_blank" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0 cm-news-card">
+                        <img src="/images/movies/news3.jpg" class="card-img-top" alt="" C:\Users\HP\Pictures\a.jpg"">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">Phim được đánh giá cao</h5>
+                            <p class="card-text small">
+                                Tổng hợp các bộ phim đang được giới phê bình và khán giả đánh giá tích cực.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-bg: #fffafd;
+        --cm-text-main: #333333;
+    }
+
+    body {
+        background: linear-gradient(145deg, #ffeaf5, #ffffff);
+        color: var(--cm-text-main);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .cm-marquee {
+        background: linear-gradient(to right, #ff7fb6, #ffb6e2);
+        color: #fff;
+        padding: 10px 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-align: center;
+        box-shadow: 0 6px 14px rgba(255, 160, 200, 0.6);
+    }
+
+    /* HERO */
+    .cm-hero {
+        padding: 2.5rem 0 1rem;
+    }
+
+    .cm-slider {
+        position: relative;
+        overflow: hidden;
+        border-radius: 22px;
+        background: linear-gradient(120deg, #ffeaf5, #ffffff);
+        box-shadow: 0 18px 40px rgba(255, 160, 200, 0.5);
+        padding: 2.2rem 2.5rem;
+    }
+
+    .cm-slide {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+        .cm-slide.active {
+            display: block;
+            opacity: 1;
+        }
+
+    .cm-hero-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--cm-pink-strong);
+        text-shadow: 0 0 10px rgba(255, 182, 210, 0.9);
+    }
+
+    .cm-hero-sub {
+        margin-top: 0.5rem;
+        color: #555;
+        font-size: 0.98rem;
+    }
+
+    .cm-hero-meta {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #777;
+    }
+
+    .cm-hero-poster-wrapper {
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 22px;
+        border: 1px solid var(--cm-border-soft);
+        display: inline-block;
+    }
+
+    .cm-hero-poster {
+        max-width: 100%;
+        border-radius: 18px;
+        display: block;
+    }
+
+    .cm-slider-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 1.5rem;
+    }
+
+        .cm-slider-dots .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            background: #ffd6eb;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+            .cm-slider-dots .dot.active {
+                width: 28px;
+                background: var(--cm-pink-main);
+            }
+
+    /* BUTTONS */
+    .cm-btn-primary {
+        background-color: var(--cm-pink-main);
+        border-color: var(--cm-pink-main);
+        color: #fff;
+        border-radius: 999px;
+        padding: 0.45rem 1.5rem;
+        font-weight: 600;
+        box-shadow: 0 10px 24px rgba(255, 143, 188, 0.8);
+    }
+
+        .cm-btn-primary:hover {
+            background-color: #ff5f9f;
+            border-color: #ff5f9f;
+        }
+
+    .cm-btn-light {
+        background-color: #fff;
+        border-radius: 999px;
+        padding: 0.45rem 1.4rem;
+        border: 1px solid var(--cm-border-soft);
+        font-weight: 600;
+        color: var(--cm-text-main);
+    }
+
+        .cm-btn-light:hover {
+            border-color: var(--cm-pink-main);
+            color: var(--cm-pink-strong);
+        }
+
+    .cm-btn-outline-main {
+        border-radius: 999px;
+        border: 1.5px solid var(--cm-pink-main);
+        color: var(--cm-pink-main);
+        background: #fff;
+        font-weight: 600;
+        padding: 0.45rem 1.3rem;
+    }
+
+        .cm-btn-outline-main:hover {
+            background: var(--cm-pink-main);
+            color: #fff;
+        }
+
+    /* SECTION */
+    .cm-section {
+        padding: 2.5rem 0 1rem;
+    }
+
+    .cm-section-alt {
+        background: #fff7fc;
+        border-top: 1px solid #ffe0f2;
+        border-bottom: 1px solid #ffe0f2;
+    }
+
+    .cm-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.3rem;
+    }
+
+        .cm-section-header h3 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--cm-pink-strong);
+        }
+
+    /* GENRE CARDS */
+    .cm-genre-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 0.8rem 1rem;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: 1px solid var(--cm-border-soft);
+        box-shadow: 0 8px 18px rgba(255, 160, 200, 0.35);
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+        .cm-genre-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 26px rgba(255, 160, 200, 0.55);
+            border-color: var(--cm-pink-main);
+        }
+
+    /* NEWS CARDS */
+    .cm-news-card {
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    }
+
+        .cm-news-card img {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .cm-news-card .card-body {
+            padding: 0.85rem 1rem 1rem;
+        }
+
+    /* EVENT CARD (trong _EventCard) – chỉnh lại style phim */
+    .event-card {
+        background-color: #ffffff !important;
+        border-radius: 18px !important;
+        border: 1px solid var(--cm-border-soft) !important;
+        box-shadow: 0 10px 24px rgba(255, 160, 200, 0.45);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 32px rgba(255, 160, 200, 0.7);
+        }
+
+        .event-card .btn {
+            border-radius: 999px !important;
+        }
+
+        .event-card .btn-primary,
+        .event-card .btn-success {
+            background-color: var(--cm-pink-main) !important;
+            border-color: var(--cm-pink-main) !important;
+        }
+
+            .event-card .btn-primary:hover,
+            .event-card .btn-success:hover {
+                background-color: #ff5f9f !important;
+                border-color: #ff5f9f !important;
+            }
+</style>
+
+<!-- ⏳ JS countdown (giữ nguyên logic) + slider -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Countdown cho các card
+        const countdowns = document.querySelectorAll(".countdown");
+
+        countdowns.forEach(el => {
+            const timeSpan = el.querySelector(".time");
+            const targetDate = new Date(el.dataset.date);
+
+            const update = () => {
+                const now = new Date();
+                const diff = targetDate - now;
+
+                if (diff <= 0) {
+                    timeSpan.textContent = "Đã diễn ra!";
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+                timeSpan.textContent = `${days} ngày ${hours} giờ ${minutes} phút`;
+            };
+
+            update();
+            setInterval(update, 60000);
+        });
+
+        // Slider
+        const slides = document.querySelectorAll(".cm-slide");
+        const dots = document.querySelectorAll(".cm-slider-dots .dot");
+        let currentIndex = 0;
+
+        function showSlide(index) {
+            slides.forEach(s => s.classList.remove("active"));
+            dots.forEach(d => d.classList.remove("active"));
+            if (slides[index]) slides[index].classList.add("active");
+            if (dots[index]) dots[index].classList.add("active");
+            currentIndex = index;
+        }
+
+        dots.forEach(dot => {
+            dot.addEventListener("click", () => {
+                const idx = parseInt(dot.getAttribute("data-index"));
+                showSlide(idx);
+            });
+        });
+
+        if (slides.length > 1) {
+            setInterval(() => {
+                const nextIndex = (currentIndex + 1) % slides.length;
+                showSlide(nextIndex);
+            }, 6000);
+        }
+    });
+</script>

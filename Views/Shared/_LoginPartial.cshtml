@@ -1,0 +1,104 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<ul class="navbar-nav align-items-center">
+
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item me-2">
+            <span class="nav-link cm-user-text">
+                Xin chào, <strong>@User.Identity?.Name</strong>
+            </span>
+        </li>
+
+        <li class="nav-item">
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit" class="nav-link btn cm-btn-logout">
+                     Đăng xuất
+                </button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link cm-btn-login" asp-controller="Account" asp-action="Login">ĐĂNG NHẬP</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link cm-btn-register" asp-controller="Account" asp-action="Register">ĐĂNG KÝ</a>
+        </li>
+    }
+</ul>
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-text-main: #3d3d3d;
+    }
+
+    .cm-user-text {
+        color: var(--cm-text-main);
+        font-weight: 500;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: #fff4fb;
+        border: 1px solid #ffd6eb;
+    }
+
+    /* Nút Login */
+    .cm-btn-login {
+        padding: 6px 16px;
+        border-radius: 999px;
+        border: 1px solid var(--cm-pink-main);
+        color: var(--cm-pink-main) !important;
+        font-weight: 600;
+        transition: 0.25s;
+    }
+
+        .cm-btn-login:hover {
+            background-color: var(--cm-pink-main);
+            color: white !important;
+            border-color: var(--cm-pink-main);
+        }
+
+    /* Nút Register */
+    .cm-btn-register {
+        padding: 6px 18px;
+        border-radius: 999px;
+        background-color: var(--cm-pink-main);
+        color: white !important;
+        font-weight: 600;
+        margin-left: 6px;
+        transition: 0.25s;
+        box-shadow: 0 8px 20px rgba(255, 143, 188, 0.45);
+    }
+
+        .cm-btn-register:hover {
+            background-color: var(--cm-pink-strong);
+            box-shadow: 0 10px 26px rgba(255, 100, 160, 0.55);
+        }
+
+    /* Nút Logout */
+    .cm-btn-logout {
+        background: transparent;
+        border: 1.5px solid #ff9dbf;
+        border-radius: 999px;
+        padding: 6px 18px;
+        color: #ff4f93 !important;
+        font-weight: 600;
+        transition: 0.25s;
+    }
+
+        .cm-btn-logout:hover {
+            background: #ff7fb6;
+            color: #ffffff !important;
+            border-color: #ff7fb6;
+        }
+
+    .navbar-nav .nav-link {
+        margin: 0 4px;
+    }
+</style>

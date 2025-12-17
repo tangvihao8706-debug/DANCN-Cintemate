@@ -1,0 +1,218 @@
+﻿@model EventManager.Models.EventModel
+@{
+    ViewData["Title"] = "Thêm phim / suất chiếu";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<h2 class="cm-admin-title"> Thêm phim mới</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form asp-area="Admin"
+      asp-controller="Dashboard"
+      asp-action="CreateEvent"
+      method="post"
+      enctype="multipart/form-data"
+      class="cm-admin-form">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Tiêu đề phim</label>
+        <input asp-for="Title" class="form-control cm-input" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Mô tả</label>
+        <textarea asp-for="Description" class="form-control cm-input" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Thể loại</label>
+        <select asp-for="GenreId" asp-items="ViewBag.Genres" class="form-control cm-input">
+            <option value="0">-- Chọn thể loại --</option>
+        </select>
+        <span asp-validation-for="GenreId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Ngày chiếu</label>
+        <input asp-for="Date" type="date" class="form-control cm-input" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Rạp / Phòng chiếu</label>
+        <input asp-for="Location" class="form-control cm-input" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Giá vé (VNĐ)</label>
+        <input asp-for="TicketPrice" type="number" class="form-control cm-input" />
+        <span asp-validation-for="TicketPrice" class="text-danger"></span>
+    </div>
+
+    <div class="row">
+        <div class="mb-3 col-md-6">
+            <label class="form-label">Giờ bắt đầu</label>
+            <input asp-for="StartTime" class="form-control cm-input" placeholder="VD: 18:00" />
+        </div>
+
+        <div class="mb-3 col-md-6">
+            <label class="form-label"> Giờ kết thúc</label>
+            <input asp-for="EndTime" class="form-control cm-input" placeholder="VD: 20:30" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Đạo diễn / Diễn viên chính</label>
+        <input asp-for="Artists" class="form-control cm-input" placeholder="VD: Christopher Nolan, Cillian Murphy" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Số ghế tối đa (phòng chiếu)</label>
+        <input asp-for="MaxParticipants" class="form-control cm-input" />
+        <span asp-validation-for="MaxParticipants" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Google Maps Embed URL (rạp)</label>
+        <input asp-for="MapEmbedUrl" class="form-control cm-input" placeholder="https://maps.google.com/..." />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label"> Trang Facebook phim / rạp</label>
+        <input asp-for="FacebookUrl" class="form-control cm-input" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Trailer YouTube (nếu có)</label>
+        <input asp-for="YoutubeUrl" class="form-control cm-input" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Thông tin thêm (HTML)</label>
+        <textarea asp-for="ScheduleHtml"
+                  class="form-control cm-input"
+                  rows="5"
+                  placeholder="Bạn có thể dùng HTML (bảng, danh sách...) để hiển thị thông tin chi tiết về phim / suất chiếu."></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label"> Poster phim (chỉ hình ảnh)</label>
+        <input type="file"
+               name="mediaFile"
+               class="form-control cm-input"
+               accept="image/*" />
+    </div>
+
+    <button type="submit" class="btn cm-btn-primary"> Lưu phim</button>
+    <a href="/Admin/Dashboard/Index" class="btn cm-btn-secondary ms-2">Quay lại Dashboard</a>
+    <a href="/Admin/Dashboard/ManageEvents" class="btn cm-btn-secondary ms-2"> Danh sách phim</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    :root {
+        --cm-pink-main: #ff7fb6;
+        --cm-pink-soft: #ffeaf5;
+        --cm-pink-strong: #ff4f93;
+        --cm-border-soft: #ffd6eb;
+        --cm-text-main: #333333;
+    }
+
+    body {
+        background: linear-gradient(135deg, #ffeaf5, #ffffff);
+        font-family: 'Segoe UI', sans-serif;
+        color: var(--cm-text-main);
+    }
+
+    .cm-admin-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--cm-pink-strong);
+        text-shadow: 0 0 10px rgba(255, 190, 210, 0.7);
+    }
+
+    .cm-admin-form {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 24px 26px;
+        box-shadow: 0 14px 32px rgba(255, 160, 200, 0.35);
+        border: 1px solid var(--cm-border-soft);
+        max-width: 800px;
+    }
+
+    .cm-input {
+        background-color: #ffffff;
+        border: 1.5px solid #ffd6eb;
+        border-radius: 10px;
+        color: var(--cm-text-main);
+        box-shadow: none;
+    }
+
+        .cm-input::placeholder {
+            color: #b0b0b0;
+            opacity: 0.9;
+        }
+
+        .cm-input:focus {
+            border-color: var(--cm-pink-main);
+            box-shadow: 0 0 0 0.12rem rgba(255, 127, 182, 0.35);
+            outline: none;
+        }
+
+    .cm-btn-primary {
+        background-color: var(--cm-pink-main);
+        border: none;
+        color: #ffffff;
+        font-weight: 600;
+        border-radius: 999px;
+        padding: 8px 22px;
+        box-shadow: 0 10px 24px rgba(255, 143, 188, 0.7);
+        transition: 0.2s;
+    }
+
+        .cm-btn-primary:hover {
+            background-color: var(--cm-pink-strong);
+            box-shadow: 0 12px 30px rgba(255, 110, 170, 0.8);
+        }
+
+    .cm-btn-secondary {
+        background-color: #ffffff;
+        border-radius: 999px;
+        border: 1.5px solid var(--cm-pink-main);
+        color: var(--cm-pink-main);
+        font-weight: 500;
+        padding: 8px 18px;
+        transition: 0.2s;
+    }
+
+        .cm-btn-secondary:hover {
+            background-color: var(--cm-pink-main);
+            color: #ffffff;
+        }
+
+    .alert {
+        border-radius: 10px;
+        border: 1px solid var(--cm-border-soft);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    }
+</style>
